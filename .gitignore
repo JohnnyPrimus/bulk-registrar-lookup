@@ -4,9 +4,10 @@
 #Ignore vscode
 .vscode
 
-#Ignore api-key and api-key.age
-api-key
-api-key.age
+#Ignore any .tsv, .csv, or .age (inlcuding default api-key.agi)
+*.tsv
+*.csv
+*.age
 
 #Ignore pycache
 __pycache__
