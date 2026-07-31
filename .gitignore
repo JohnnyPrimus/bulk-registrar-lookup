@@ -1,0 +1,12 @@
+#Ignore claude directory
+.claude
+
+#Ignore vscode
+.vscode
+
+#Ignore pycache
+__pycache__
+**/__pycache__
+
+#Ignore vscode AI rules
+.github\instructions\codacy.instructions.md
