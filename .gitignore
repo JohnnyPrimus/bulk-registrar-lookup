@@ -4,6 +4,10 @@
 #Ignore vscode
 .vscode
 
+#Ignore api-key and api-key.age
+api-key
+api-key.age
+
 #Ignore pycache
 __pycache__
 **/__pycache__

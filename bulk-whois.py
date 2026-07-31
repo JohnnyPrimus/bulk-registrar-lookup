@@ -1,4 +1,5 @@
 import argparse
+import csv
 import time
 from pathlib import Path
 from urllib.parse import urlencode
@@ -8,7 +9,8 @@ import requests
 from age import NoIdentityMatchError, ScryptIdentity, decrypt_bytes
 
 RATE_LIMIT      = 20   # req/min — Pro:40, Ultra:60, Scale/Mega:100, Atlas:900
-DEFAULT_KEY_FILE = Path(__file__).with_name('api_key.age')
+DEFAULT_KEY_FILE    = Path(__file__).with_name('api_key.age')
+DEFAULT_OUTPUT_FILE = Path('results.csv')
 
 
 def load_api_key(password: str, api_key_file: Path) -> str:
@@ -67,24 +69,41 @@ def bulk_whois(session: requests.Session, domains: list[str]) -> list[dict]:
     return results
 
 
+def load_domains(domains_file: Path) -> list[str]:
+    lines = domains_file.read_text().splitlines()
+    return [line.strip() for line in lines if line.strip()]
+
+
+def write_csv(results: list[dict], output_file: Path) -> None:
+    with output_file.open('w', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow(['domain', 'registrar'])
+        for result in results:
+            writer.writerow([result['domain'], result.get('registrar', '')])
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description='Bulk WHOIS lookup via whoisjson.com')
     parser.add_argument('password', help='passphrase used to decrypt the age-encrypted API key')
+    parser.add_argument('domains_file', type=Path, help='file containing one domain per line')
     parser.add_argument('--api-key-file', type=Path, default=DEFAULT_KEY_FILE,
                          help=f'path to the age-encrypted API key (default: {DEFAULT_KEY_FILE.name})')
-    parser.add_argument('domains', nargs='*', default=['example.com', 'github.com', 'google.com'])
+    parser.add_argument('--output', type=Path, default=DEFAULT_OUTPUT_FILE,
+                         help=f'path to write CSV results (default: {DEFAULT_OUTPUT_FILE})')
     return parser.parse_args()
 
 
 def main() -> None:
     args = parse_args()
 
+    domains = load_domains(args.domains_file)
     api_key = load_api_key(args.password, args.api_key_file)
     session = requests.Session()
     session.headers['Authorization'] = f'TOKEN={api_key}'
 
-    results = bulk_whois(session, args.domains)
-    print(f'Done: {len(results)} lookups')
+    results = bulk_whois(session, domains)
+    write_csv(results, args.output)
+    print(f'Done: {len(results)} lookups, results written to {args.output}')
 
 
 if __name__ == '__main__':
