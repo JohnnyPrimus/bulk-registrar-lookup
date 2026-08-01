@@ -4,7 +4,7 @@
 #Ignore vscode
 .vscode
 
-#Ignore any .tsv, .csv, or .age (inlcuding default api-key.agi)
+#Ignore any .tsv, .csv, or .age (inlcuding default api_key.agi)
 *.tsv
 *.csv
 *.age
