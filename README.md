@@ -1,4 +1,4 @@
-# bulk-registrar-lookup
+# bulk-domain-whois
 
 A small CLI tool that looks up the registrar (and other WHOIS/RDAP data) for a
 list of domains via the [whoisjson.com](https://whoisjson.com) API, respecting
